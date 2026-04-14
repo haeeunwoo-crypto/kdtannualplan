@@ -13,13 +13,13 @@
 
     <!-- Chosen Palette: Kernel Brand (Deep Navy #1A1B3A, Vivid Red #F0154B, Clean White #FFFFFF) -->
     <!-- Application Structure Plan: 
-         - GNB removed as requested for a cleaner landing experience.
-         - Hero Section: Clean white background with high-contrast Navy text and Red accents for maximum readability and modern aesthetic.
-         - Data Visualization: A Chart.js doughnut chart provides a quick visual summary of the balanced support system.
-         - Interactive SPA Section: The "3-Step Strategy" acts as a functional filter. Clicking a step dynamically updates the "Services" grid below to show only relevant programs, reducing cognitive load and making exploration intuitive. -->
+         - GNB removed. High-impact Hero section.
+         - Data Visualization: Doughnut chart for program balance.
+         - Interactive SPA Section: Modified the generic card grid into a "Staircase Infographic Roadmap". Cards are grouped into 3 ascending columns to visually represent career growth (Basic -> Skill -> Match).
+         - Filtering Logic: Clicking a step hides other columns and removes the "staircase" offset so the selected category is highlighted perfectly at the top. -->
     <!-- Visualization & Content Choices: 
-         - Balance Chart -> Goal: Inform/Proportion -> Method: Doughnut Chart (Chart.js Canvas) -> Interaction: Hover tooltips -> Justification: Shows that support is not just heavily skewed to one area, but balanced across basics, skills, and matching. (NO SVG used).
-         - 3-Step Strategy -> Goal: Organize/Filter -> Method: Interactive HTML/CSS Tabs -> Interaction: Click to filter services -> Justification: Allows users to focus on the specific type of support they need at their current stage. (NO SVG used). -->
+         - Balance Chart -> Goal: Inform/Proportion -> Method: Doughnut Chart (Chart.js Canvas).
+         - Infographic Roadmap -> Goal: Show progression -> Method: Staggered CSS Grid with connecting arrows (NO SVG, pure HTML/CSS/FontAwesome) -> Interaction: SPA tabs filter the columns. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
     <style>
@@ -63,17 +63,10 @@
             color: #F0154B;
         }
 
-        /* Service Cards */
-        .service-card {
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            opacity: 1;
-            transform: translateY(0);
-            display: flex;
-        }
-        .service-card.hidden-card {
-            display: none;
-            opacity: 0;
-            transform: translateY(10px);
+        /* Infographic Column Header Shape */
+        .info-header {
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+            padding-bottom: 2rem;
         }
 
         /* Clean Animations */
@@ -81,8 +74,17 @@
             animation: fadeIn 0.5s ease-out forwards;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Floating animation for arrows */
+        .float-anim {
+            animation: floatUpDown 2s ease-in-out infinite;
+        }
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0) rotate(-15deg); }
+            50% { transform: translateY(-10px) rotate(-15deg); }
         }
     </style>
     <script>
@@ -155,7 +157,7 @@
     </section>
 
     <!-- Interactive 3-Step Strategy & Services (SPA) -->
-    <section class="py-24 bg-white" id="programs">
+    <section class="pt-24 pb-32 bg-white" id="programs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-4xl font-extrabold text-kernel-navy mb-4 tracking-tight">성공적인 취업을 위한 3-Step 전략</h2>
@@ -188,117 +190,158 @@
                 </div>
             </div>
 
-            <!-- Services Header -->
-            <div class="flex justify-between items-end border-b-2 border-kernel-navy pb-4 mb-10">
+            <!-- Services Infographic Header -->
+            <div class="flex justify-between items-end border-b-2 border-kernel-navy pb-4 mb-16 max-w-6xl mx-auto">
                 <div>
-                    <h3 class="text-2xl font-extrabold text-kernel-navy" id="section-title">전체 취업 지원 프로그램 (7)</h3>
+                    <h3 class="text-2xl font-extrabold text-kernel-navy" id="section-title">커리어 성장 로드맵 (전체 7개 프로그램)</h3>
                 </div>
                 <button onclick="filterServices('all')" class="text-sm font-bold text-gray-500 hover:text-kernel-red transition-colors" id="btn-show-all" style="display: none;">
-                    <i class="fa-solid fa-rotate-right mr-1"></i> 전체 보기
+                    <i class="fa-solid fa-rotate-right mr-1"></i> 전체 로드맵 보기
                 </button>
             </div>
 
-            <!-- Dynamic Services Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="services-grid">
+            <!-- Infographic Staircase Layout -->
+            <div class="relative max-w-6xl mx-auto">
                 
-                <!-- Basic 1 -->
-                <div class="service-card flex-col bg-white border border-kernel-border rounded-xl p-8 hover:border-kernel-red hover:shadow-lg" data-category="basic">
-                    <div class="w-12 h-12 bg-kernel-lightred text-kernel-red rounded-lg flex items-center justify-center text-xl mb-6">
-                        <i class="fa-solid fa-file-signature"></i>
-                    </div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <h4 class="text-xl font-bold text-kernel-navy">SOS 멘토링</h4>
-                        <span class="bg-gray-100 text-gray-600 text-[11px] px-2 py-1 rounded font-bold">1:1 밀착</span>
-                    </div>
-                    <p class="text-gray-500 text-sm leading-relaxed">
-                        이력서, 자소서, 포트폴리오 첨삭부터 모의 면접까지! 현업 멘토와 1:1로 연결되어 내게 꼭 맞는 밀착 피드백을 받는 든든한 지원군입니다.
-                    </p>
+                <!-- Connecting Arrows (Visible only on Desktop in 'All' view) -->
+                <div class="hidden lg:block absolute top-[28%] left-[28%] text-kernel-lightred text-6xl z-0 infographic-arrow float-anim">
+                    <i class="fa-solid fa-arrow-right-long"></i>
+                </div>
+                <div class="hidden lg:block absolute top-[18%] left-[62%] text-kernel-lightred text-6xl z-0 infographic-arrow float-anim">
+                    <i class="fa-solid fa-arrow-right-long"></i>
+                </div>
+                <!-- Final Goal Target Icon -->
+                <div class="hidden lg:flex absolute -top-[4rem] -right-[2rem] w-24 h-24 bg-kernel-red rounded-full text-white items-center justify-center text-4xl shadow-xl z-20 infographic-arrow">
+                    <i class="fa-solid fa-flag-checkered"></i>
                 </div>
 
-                <!-- Basic 2 -->
-                <div class="service-card flex-col bg-white border border-kernel-border rounded-xl p-8 hover:border-kernel-red hover:shadow-lg" data-category="basic">
-                    <div class="w-12 h-12 bg-kernel-lightred text-kernel-red rounded-lg flex items-center justify-center text-xl mb-6">
-                        <i class="fa-solid fa-chalkboard-user"></i>
-                    </div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <h4 class="text-xl font-bold text-kernel-navy">취업 마스터 특강</h4>
-                        <span class="bg-gray-100 text-gray-600 text-[11px] px-2 py-1 rounded font-bold">온/오프라인</span>
-                    </div>
-                    <p class="text-gray-500 text-sm leading-relaxed">
-                        본사 및 전국 지사 어디서든 참여 가능한 특강! 서류 작성법, 면접 전략 등 취업의 핵심을 꿰뚫는 전문 컨설팅이 진행됩니다.
-                    </p>
-                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10 relative z-10" id="infographic-grid">
+                    
+                    <!-- STEP 1 COLUMN (Lowest) -->
+                    <div class="step-column transition-all duration-500 ease-in-out lg:mt-24" data-category="basic">
+                        <div class="bg-kernel-navy text-white text-center pt-6 info-header relative overflow-hidden mb-4 shadow-md">
+                            <div class="absolute -right-2 -top-2 text-white/10 text-7xl font-black">1</div>
+                            <div class="text-kernel-red font-bold text-sm tracking-widest mb-1">STEP 01</div>
+                            <h3 class="font-extrabold text-2xl relative z-10">기본기 마스터</h3>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <!-- Basic Card 1 -->
+                            <div class="bg-white border border-gray-200 p-5 rounded-xl hover:border-kernel-red hover:shadow-md transition-all relative group">
+                                <div class="absolute left-0 top-0 h-full w-1 bg-kernel-border group-hover:bg-kernel-red rounded-l-xl transition-colors"></div>
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-kernel-lightred text-kernel-red flex items-center justify-center text-sm">
+                                        <i class="fa-solid fa-file-signature"></i>
+                                    </div>
+                                    <h4 class="font-bold text-kernel-navy text-lg tracking-tight">SOS 멘토링</h4>
+                                </div>
+                                <p class="text-xs text-gray-500 mb-2"><span class="bg-gray-100 text-kernel-navy font-bold px-2 py-1 rounded">1:1 밀착</span></p>
+                                <p class="text-sm text-gray-600 leading-relaxed">이력서, 자소서, 포트폴리오 첨삭부터 모의 면접까지 현업 멘토의 1:1 맞춤 피드백</p>
+                            </div>
 
-                <!-- Skill 1 -->
-                <div class="service-card flex-col bg-white border border-kernel-border rounded-xl p-8 hover:border-kernel-red hover:shadow-lg" data-category="skill">
-                    <div class="w-12 h-12 bg-kernel-lightred text-kernel-red rounded-lg flex items-center justify-center text-xl mb-6">
-                        <i class="fa-solid fa-laptop-code"></i>
+                            <!-- Basic Card 2 -->
+                            <div class="bg-white border border-gray-200 p-5 rounded-xl hover:border-kernel-red hover:shadow-md transition-all relative group">
+                                <div class="absolute left-0 top-0 h-full w-1 bg-kernel-border group-hover:bg-kernel-red rounded-l-xl transition-colors"></div>
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-kernel-lightred text-kernel-red flex items-center justify-center text-sm">
+                                        <i class="fa-solid fa-chalkboard-user"></i>
+                                    </div>
+                                    <h4 class="font-bold text-kernel-navy text-lg tracking-tight">취업 마스터 특강</h4>
+                                </div>
+                                <p class="text-xs text-gray-500 mb-2"><span class="bg-gray-100 text-kernel-navy font-bold px-2 py-1 rounded">온/오프라인</span></p>
+                                <p class="text-sm text-gray-600 leading-relaxed">서류 작성법, 면접 전략 등 취업 핵심을 꿰뚫는 전문 컨설팅 및 주기적 특강</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <h4 class="text-xl font-bold text-kernel-navy">리부트 캠프</h4>
-                        <span class="bg-gray-100 text-gray-600 text-[11px] px-2 py-1 rounded font-bold">심화 교육</span>
-                    </div>
-                    <p class="text-gray-500 text-sm leading-relaxed">
-                        수료 후에도 성장은 멈추지 않습니다! AI 전문가와 함께 트렌드에 맞춘 AI 활용법과 실서비스를 개발하며 취업 경쟁력을 높입니다.
-                    </p>
-                </div>
 
-                <!-- Skill 2 -->
-                <div class="service-card flex-col bg-white border border-kernel-border rounded-xl p-8 hover:border-kernel-red hover:shadow-lg" data-category="skill">
-                    <div class="w-12 h-12 bg-kernel-lightred text-kernel-red rounded-lg flex items-center justify-center text-xl mb-6">
-                        <i class="fa-solid fa-microphone-lines"></i>
-                    </div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <h4 class="text-xl font-bold text-kernel-navy">현직자 인사이트 특강</h4>
-                        <span class="bg-gray-100 text-gray-600 text-[11px] px-2 py-1 rounded font-bold">전문가 초빙</span>
-                    </div>
-                    <p class="text-gray-500 text-sm leading-relaxed">
-                        각 분야 최고 전문가들의 생생한 현장 이야기! 최신 산업 트렌드 파악은 물론 커리어 전환을 위한 특급 노하우를 제공합니다.
-                    </p>
-                </div>
+                    <!-- STEP 2 COLUMN (Middle) -->
+                    <div class="step-column transition-all duration-500 ease-in-out lg:mt-12" data-category="skill">
+                        <div class="bg-kernel-navy text-white text-center pt-6 info-header relative overflow-hidden mb-4 shadow-md">
+                            <div class="absolute -right-2 -top-2 text-white/10 text-7xl font-black">2</div>
+                            <div class="text-kernel-red font-bold text-sm tracking-widest mb-1">STEP 02</div>
+                            <h3 class="font-extrabold text-2xl relative z-10">역량 & 인사이트</h3>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <!-- Skill Card 1 -->
+                            <div class="bg-white border border-gray-200 p-5 rounded-xl hover:border-kernel-red hover:shadow-md transition-all relative group">
+                                <div class="absolute left-0 top-0 h-full w-1 bg-kernel-border group-hover:bg-kernel-red rounded-l-xl transition-colors"></div>
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-kernel-lightred text-kernel-red flex items-center justify-center text-sm">
+                                        <i class="fa-solid fa-laptop-code"></i>
+                                    </div>
+                                    <h4 class="font-bold text-kernel-navy text-lg tracking-tight">리부트 캠프</h4>
+                                </div>
+                                <p class="text-xs text-gray-500 mb-2"><span class="bg-gray-100 text-kernel-navy font-bold px-2 py-1 rounded">심화 교육</span></p>
+                                <p class="text-sm text-gray-600 leading-relaxed">수료 후 트렌드에 맞춘 AI 활용법과 실서비스 개발 경험을 통한 경쟁력 레벨업</p>
+                            </div>
 
-                <!-- Match 1 -->
-                <div class="service-card flex-col bg-white border border-kernel-border rounded-xl p-8 hover:border-kernel-red hover:shadow-lg" data-category="match">
-                    <div class="w-12 h-12 bg-kernel-lightred text-kernel-red rounded-lg flex items-center justify-center text-xl mb-6">
-                        <i class="fa-solid fa-building-user"></i>
+                            <!-- Skill Card 2 -->
+                            <div class="bg-white border border-gray-200 p-5 rounded-xl hover:border-kernel-red hover:shadow-md transition-all relative group">
+                                <div class="absolute left-0 top-0 h-full w-1 bg-kernel-border group-hover:bg-kernel-red rounded-l-xl transition-colors"></div>
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-kernel-lightred text-kernel-red flex items-center justify-center text-sm">
+                                        <i class="fa-solid fa-microphone-lines"></i>
+                                    </div>
+                                    <h4 class="font-bold text-kernel-navy text-lg tracking-tight">현직자 연사 특강</h4>
+                                </div>
+                                <p class="text-xs text-gray-500 mb-2"><span class="bg-gray-100 text-kernel-navy font-bold px-2 py-1 rounded">전문가 초빙</span></p>
+                                <p class="text-sm text-gray-600 leading-relaxed">각 분야 최고 전문가들의 현장 이야기 및 커리어 전환 성공 노하우 획득</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <h4 class="text-xl font-bold text-kernel-navy">커널 인턴십</h4>
-                        <span class="bg-gray-100 text-gray-600 text-[11px] px-2 py-1 rounded font-bold">실무 경험</span>
-                    </div>
-                    <p class="text-gray-500 text-sm leading-relaxed">
-                        배운 것을 실전에서! 취업팀이 엄선한 파트너 기업에 수료생을 추천하여, 실무 경험을 쌓고 정규직 전환의 기회까지 노릴 수 있습니다.
-                    </p>
-                </div>
 
-                <!-- Match 2 -->
-                <div class="service-card flex-col bg-white border border-kernel-border rounded-xl p-8 hover:border-kernel-red hover:shadow-lg" data-category="match">
-                    <div class="w-12 h-12 bg-kernel-lightred text-kernel-red rounded-lg flex items-center justify-center text-xl mb-6">
-                        <i class="fa-solid fa-handshake-simple"></i>
-                    </div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <h4 class="text-xl font-bold text-kernel-navy">채용 매칭 행사</h4>
-                        <span class="bg-gray-100 text-gray-600 text-[11px] px-2 py-1 rounded font-bold">오프라인</span>
-                    </div>
-                    <p class="text-gray-500 text-sm leading-relaxed">
-                        IT/Tech 인재를 찾는 우수 기업들과 오프라인에서 직접 만나는 자리! 현장 면접부터 맞춤 채용 상담까지 이루어집니다.
-                    </p>
-                </div>
+                    <!-- STEP 3 COLUMN (Highest) -->
+                    <div class="step-column transition-all duration-500 ease-in-out lg:mt-0" data-category="match">
+                        <div class="bg-[#F0154B] text-white text-center pt-6 info-header relative overflow-hidden mb-4 shadow-md">
+                            <div class="absolute -right-2 -top-2 text-white/20 text-7xl font-black">3</div>
+                            <div class="text-kernel-navy font-extrabold text-sm tracking-widest mb-1">STEP 03</div>
+                            <h3 class="font-extrabold text-2xl relative z-10">실전 채용 매칭</h3>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <!-- Match Card 1 -->
+                            <div class="bg-white border border-gray-200 p-5 rounded-xl hover:border-kernel-red hover:shadow-md transition-all relative group">
+                                <div class="absolute left-0 top-0 h-full w-1 bg-kernel-border group-hover:bg-kernel-red rounded-l-xl transition-colors"></div>
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-kernel-lightred text-kernel-red flex items-center justify-center text-sm">
+                                        <i class="fa-solid fa-building-user"></i>
+                                    </div>
+                                    <h4 class="font-bold text-kernel-navy text-lg tracking-tight">커널 인턴십</h4>
+                                </div>
+                                <p class="text-xs text-gray-500 mb-2"><span class="bg-gray-100 text-kernel-navy font-bold px-2 py-1 rounded">실무 연계</span></p>
+                                <p class="text-sm text-gray-600 leading-relaxed">엄선된 파트너 기업 추천 및 인턴십 매칭을 통한 실무 경험과 정규직 전환 기회</p>
+                            </div>
 
-                <!-- Match 3 -->
-                <div class="service-card flex-col bg-white border border-kernel-border rounded-xl p-8 hover:border-kernel-red hover:shadow-lg" data-category="match">
-                    <div class="w-12 h-12 bg-kernel-lightred text-kernel-red rounded-lg flex items-center justify-center text-xl mb-6">
-                        <i class="fa-solid fa-magnifying-glass-chart"></i>
-                    </div>
-                    <div class="flex items-center gap-2 mb-3">
-                        <h4 class="text-xl font-bold text-kernel-navy">플랫폼 '하이어핏'</h4>
-                        <span class="bg-gray-100 text-gray-600 text-[11px] px-2 py-1 rounded font-bold">수료생 전용</span>
-                    </div>
-                    <p class="text-gray-500 text-sm leading-relaxed">
-                        전담 팀이 발굴하고 검증한 양질의 기업 채용 정보만 선별하여 수료생 전용 페이지에서 상시로 매칭해 드립니다.
-                    </p>
-                </div>
+                            <!-- Match Card 2 -->
+                            <div class="bg-white border border-gray-200 p-5 rounded-xl hover:border-kernel-red hover:shadow-md transition-all relative group">
+                                <div class="absolute left-0 top-0 h-full w-1 bg-kernel-border group-hover:bg-kernel-red rounded-l-xl transition-colors"></div>
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-kernel-lightred text-kernel-red flex items-center justify-center text-sm">
+                                        <i class="fa-solid fa-handshake-simple"></i>
+                                    </div>
+                                    <h4 class="font-bold text-kernel-navy text-lg tracking-tight">채용 매칭 행사</h4>
+                                </div>
+                                <p class="text-xs text-gray-500 mb-2"><span class="bg-gray-100 text-kernel-navy font-bold px-2 py-1 rounded">오프라인</span></p>
+                                <p class="text-sm text-gray-600 leading-relaxed">IT 인재를 찾는 우수 기업들과 오프라인에서 직접 대면하는 현장 채용 면접</p>
+                            </div>
 
+                            <!-- Match Card 3 -->
+                            <div class="bg-white border border-gray-200 p-5 rounded-xl hover:border-kernel-red hover:shadow-md transition-all relative group">
+                                <div class="absolute left-0 top-0 h-full w-1 bg-kernel-border group-hover:bg-kernel-red rounded-l-xl transition-colors"></div>
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-kernel-lightred text-kernel-red flex items-center justify-center text-sm">
+                                        <i class="fa-solid fa-magnifying-glass-chart"></i>
+                                    </div>
+                                    <h4 class="font-bold text-kernel-navy text-lg tracking-tight">플랫폼 '하이어핏'</h4>
+                                </div>
+                                <p class="text-xs text-gray-500 mb-2"><span class="bg-gray-100 text-kernel-navy font-bold px-2 py-1 rounded">수료생 전용</span></p>
+                                <p class="text-sm text-gray-600 leading-relaxed">전담 팀이 발굴한 검증된 기업 채용 정보만 선별 제공하는 수료생 전용 매칭 플랫폼</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </section>
@@ -381,41 +424,59 @@
 
         // SPA Filtering Logic
         function filterServices(category) {
-            const cards = document.querySelectorAll('.service-card');
+            const columns = document.querySelectorAll('.step-column');
             const tabs = document.querySelectorAll('.step-filter');
             const title = document.getElementById('section-title');
             const btnAll = document.getElementById('btn-show-all');
+            const arrows = document.querySelectorAll('.infographic-arrow');
 
             // Update Tabs UI
             tabs.forEach(tab => tab.classList.remove('active'));
             if (category !== 'all') {
                 document.getElementById('tab-' + category).classList.add('active');
                 btnAll.style.display = 'block';
+                // Hide infographic elements when filtered
+                arrows.forEach(arr => arr.style.display = 'none');
             } else {
                 btnAll.style.display = 'none';
+                // Show infographic elements for full view
+                arrows.forEach(arr => arr.style.display = 'flex');
             }
 
             // Update Title
             const titles = {
-                'all': '전체 취업 지원 프로그램 (7)',
-                'basic': 'Basic & Core 프로그램 (2)',
-                'skill': 'Skill-up & Insight 프로그램 (2)',
-                'match': 'Match & Go 프로그램 (3)'
+                'all': '커리어 성장 로드맵 (전체 7개 프로그램)',
+                'basic': 'Step 1. 기본기 마스터 (2개 프로그램)',
+                'skill': 'Step 2. 역량 & 인사이트 강화 (2개 프로그램)',
+                'match': 'Step 3. 실전 채용 매칭 (3개 프로그램)'
             };
             title.textContent = titles[category];
 
-            // Filter Cards
-            cards.forEach(card => {
+            // Filter Columns & Adjust Staircase Layout
+            columns.forEach(col => {
                 // Reset animation
-                card.classList.remove('fade-in');
+                col.classList.remove('fade-in');
                 
-                if (category === 'all' || card.dataset.category === category) {
-                    card.classList.remove('hidden-card');
-                    // Trigger reflow for animation
-                    void card.offsetWidth;
-                    card.classList.add('fade-in');
+                if (category === 'all') {
+                    col.style.display = 'block';
+                    // Restore staircase visual offsets
+                    if(col.dataset.category === 'basic') col.classList.add('lg:mt-24');
+                    if(col.dataset.category === 'skill') col.classList.add('lg:mt-12');
+                    if(col.dataset.category === 'match') col.classList.add('lg:mt-0');
                 } else {
-                    card.classList.add('hidden-card');
+                    if (col.dataset.category === category) {
+                        col.style.display = 'block';
+                        // Remove offset so the single column aligns nicely at the top
+                        col.classList.remove('lg:mt-24', 'lg:mt-12', 'lg:mt-0');
+                    } else {
+                        col.style.display = 'none';
+                    }
+                }
+                
+                // Trigger reflow for animation
+                if(col.style.display === 'block') {
+                    void col.offsetWidth;
+                    col.classList.add('fade-in');
                 }
             });
         }
